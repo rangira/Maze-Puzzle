@@ -1,3 +1,5 @@
+package testString;
+
 import java.io.*;
 import java.util.*;
 
@@ -35,6 +37,8 @@ public class ReadMaze {
 
 			// printRow(maze[index++]);
 		}
+		
+		validateMaze(maze);
 
 		System.out.println("The value of index is " + index);
 		// System.out.println("destination "+ maze[11][12]);
@@ -43,6 +47,51 @@ public class ReadMaze {
 		this.walkMaze(maze, index);
 		return maze;
 	}
+	
+	
+	public void mazeRead (boolean includeDigits) throws IllegalArgumentException, IOException
+	{
+		Scanner scanner = null;
+		String text = null;
+		try {
+			File fl = new File(this.fileName);
+			scanner = new Scanner(fl);
+			text = scanner.useDelimiter("\\A").next();
+			
+		} finally {
+			if (scanner != null) {
+				scanner.close();				
+			}
+		}
+		
+		
+		String linePattern = includeDigits ? "[#.DS0-9]+" : "[#.DS]+"; 
+		
+		String[] parts = text.split("\\n", -1);
+		
+		if (!parts[parts.length - 1].isEmpty()) {
+			throw new IllegalArgumentException("File should end with a LF character.");
+		}
+		
+		int lineSize = -1;
+		for (int i = 0, len = parts.length - 1; i < len; i++) {
+			if (parts[i].isEmpty()) {
+				throw new IllegalArgumentException("Line can not be empty.");
+			}
+			if (!parts[i].matches(linePattern)) {
+				throw new IllegalArgumentException("Invalid line: " + parts[i]);
+			}
+			if (i == 0) {
+				lineSize = parts[i].length();
+			} else {
+				if (parts[i].length() != lineSize) {
+					throw new IllegalArgumentException("Invalid line size.");
+				}
+			}
+		}
+	}                                             
+	
+	
 
 	public static void printMaze(char[][] maze) {
 		for (int i = 0; i < maze.length; i++) {
@@ -115,6 +164,33 @@ public class ReadMaze {
 		}
 
 	}
+	
+	
+	void validateMaze (char maze [][])
+	{
+		System.out.println("validateMaze");
+		String s = new String (maze[0]);
+		System.out.println (s);
+		boolean endsWithNewline = s.endsWith("\n");
+		System.out.println (endsWithNewline);
+		
+		
+		int i = 0, j = 0;
+		for (i = 0; i < maze.length; i++)
+			for (j = 0; j < maze[i].length; j++) 
+			{
+				if(String.valueOf(maze[i][j]).equals("\n"))
+					System.out.println("newline");
+				
+				if(String.valueOf(maze[i][j]).matches("\n"))
+					System.out.println("newline");
+				
+				if(maze[i][j] == '\n')
+					System.out.println("newline char ");
+				
+			}
+			
+	}
 
 	void walkMaze(char[][] maze, int index) {
 		int i = 0, j = 0;
@@ -147,24 +223,32 @@ public class ReadMaze {
 	}
 
 	public static void main(String args[]) {
-		ReadMaze read = new ReadMaze(args[0]);
+		ReadMaze read = new ReadMaze("C:\\Users\\rangira\\Downloads\\p538_project1\\testdata\\task1.in.5");
 		try {
-			printMaze(read.maze());
+			read.mazeRead(false);
+			//printMaze(read.maze());
 			// read.walkMaze(read.maze());
-			System.out.println("start point : " + read.getStart().toString());
+			/*System.out.println("start point : " + read.getStart().toString());
 			System.out.println("end point : " + read.getEnd().toString());
+			
+			if(read.getTeleportPoints() != null)
 			System.out.println("teleport points : "
 					+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
 							.getTeleportPoints()));
+			
 			read.setTeleportPoints(4, 5, '1');
 			read.setTeleportPoints(2, 8, '2');
+			
+			if(read.getTeleportPoints() != null)
 			System.out.println("teleport points : "
 					+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
 							.getTeleportPoints()));
 			read.setTeleportPoints(3, 4, '3');
+			
+			if(read.getTeleportPoints() != null)
 			System.out.println("teleport points : "
 					+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
-							.getTeleportPoints()));
+							.getTeleportPoints()));*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
