@@ -1,5 +1,3 @@
-package testString;
-
 import java.io.*;
 import java.util.*;
 
@@ -37,8 +35,6 @@ public class ReadMaze {
 
 			// printRow(maze[index++]);
 		}
-		
-		validateMaze(maze);
 
 		System.out.println("The value of index is " + index);
 		// System.out.println("destination "+ maze[11][12]);
@@ -49,10 +45,42 @@ public class ReadMaze {
 	}
 	
 	
+	
+	public void mazeRead1 () throws IOException
+	{
+		char[][] maze = null;
+		File fl = new File(this.fileName);
+		Scanner sc = new Scanner(new FileInputStream(fl));
+		//String lineSeperator = "\n";
+		//sc.useDelimiter(lineSeperator);
+		//char LF = 0xA; 
+		while (sc.hasNext())
+		{
+		   	String line =sc.next();
+		   	char [] a= line.toCharArray();
+		   	System.out.println(line.contains("\n"));
+		   	//System.out.println(line.endsWith("\n"));
+		   	for (int i=0;i<a.length;i++){
+		   		String hex = String.format("%04x", (int) a[i]);
+		   		if(a[i]== '\n')
+		   			System.out.println("found newline");
+		   		System.out.print(hex + " ");
+		   	}
+		   	System.out.println();
+		   	
+		}
+	}  
+	
+	
+	
+	
 	public void mazeRead (boolean includeDigits) throws IllegalArgumentException, IOException
 	{
 		Scanner scanner = null;
 		String text = null;
+		boolean foundS = false;
+		boolean foundD = false; 
+		
 		try {
 			File fl = new File(this.fileName);
 			scanner = new Scanner(fl);
@@ -81,6 +109,23 @@ public class ReadMaze {
 			if (!parts[i].matches(linePattern)) {
 				throw new IllegalArgumentException("Invalid line: " + parts[i]);
 			}
+			
+			if( foundS == true && parts[i].indexOf('S') >= 0)
+			{
+				throw new IllegalArgumentException("Multiple start points found");
+			}
+				
+			if(foundS == false && parts[i].indexOf('S') >= 0 )
+				foundS = true;
+			
+			if( foundD == true && parts[i].indexOf('D') >= 0)
+			{
+				throw new IllegalArgumentException("Multiple end points found");
+			}
+			
+			if( foundD == false && parts[i].indexOf('D') >= 0)
+				foundD = true;
+			
 			if (i == 0) {
 				lineSize = parts[i].length();
 			} else {
@@ -93,6 +138,9 @@ public class ReadMaze {
 	
 	
 
+
+	
+
 	public static void printMaze(char[][] maze) {
 		for (int i = 0; i < maze.length; i++) {
 			for (int j = 0; j < maze[i].length; j++)
@@ -101,11 +149,35 @@ public class ReadMaze {
 		}
 
 	}
+	
+	
+	// # = 35
+	// S = 83
+	// D = 68
+	// . = 46
+	public static void printMazeAsciiChars(char[][] maze) {
+		
+		for (int i = 0; i < maze.length; i++) {
+			for (int j = 0; j < maze[i].length; j++)
+			{
+				if(maze[i][j] == ' ')
+					System.out.print(8888 + " ");	
+				else if(maze[i][j] == '\n')
+					System.out.print(9999 + " ");
+				else
+				System.out.print((int)maze[i][j] + " ");
+			}
+			System.out.println();
+		}
+	}
+	
 
 	public void printRow(char[] row) {
 		for (int i = 0; i < row.length; i++) {
 			System.out.print(row[i] + ",");
 		}
+		if(row[row.length-1]=='\n')
+			System.out.print(true);
 		System.out.println();
 	}
 
@@ -164,33 +236,6 @@ public class ReadMaze {
 		}
 
 	}
-	
-	
-	void validateMaze (char maze [][])
-	{
-		System.out.println("validateMaze");
-		String s = new String (maze[0]);
-		System.out.println (s);
-		boolean endsWithNewline = s.endsWith("\n");
-		System.out.println (endsWithNewline);
-		
-		
-		int i = 0, j = 0;
-		for (i = 0; i < maze.length; i++)
-			for (j = 0; j < maze[i].length; j++) 
-			{
-				if(String.valueOf(maze[i][j]).equals("\n"))
-					System.out.println("newline");
-				
-				if(String.valueOf(maze[i][j]).matches("\n"))
-					System.out.println("newline");
-				
-				if(maze[i][j] == '\n')
-					System.out.println("newline char ");
-				
-			}
-			
-	}
 
 	void walkMaze(char[][] maze, int index) {
 		int i = 0, j = 0;
@@ -223,32 +268,31 @@ public class ReadMaze {
 	}
 
 	public static void main(String args[]) {
-		ReadMaze read = new ReadMaze("C:\\Users\\rangira\\Downloads\\p538_project1\\testdata\\task1.in.5");
+		ReadMaze read = new ReadMaze(args[0]);
 		try {
 			read.mazeRead(false);
-			//printMaze(read.maze());
+			printMaze(read.maze());
+			
+			//printing the ascii values of the characters
+			//printMazeAsciiChars(read.maze());
 			// read.walkMaze(read.maze());
-			/*System.out.println("start point : " + read.getStart().toString());
+			System.out.println("start point : " + read.getStart().toString());
 			System.out.println("end point : " + read.getEnd().toString());
-			
 			if(read.getTeleportPoints() != null)
-			System.out.println("teleport points : "
-					+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
+			System.out.println("teleport points : "	+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
 							.getTeleportPoints()));
-			
 			read.setTeleportPoints(4, 5, '1');
+			
 			read.setTeleportPoints(2, 8, '2');
 			
 			if(read.getTeleportPoints() != null)
-			System.out.println("teleport points : "
-					+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
+			System.out.println("teleport points : "+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
 							.getTeleportPoints()));
 			read.setTeleportPoints(3, 4, '3');
 			
 			if(read.getTeleportPoints() != null)
-			System.out.println("teleport points : "
-					+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
-							.getTeleportPoints()));*/
+			System.out.println("teleport points : "	+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
+							.getTeleportPoints()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
