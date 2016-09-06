@@ -194,7 +194,8 @@ public class SolveMaze {
 		SolveMaze solveObj = new SolveMaze();
 		try {
 			// mazeObj.printMaze(mazeObj.maze());
-			maze = mazeObj.maze();
+			//maze = mazeObj.maze();
+			 maze = mazeObj.readValidMazeArrayList();
 			solveObj.solve(maze);
 		} catch (Exception e) {
 			e.printStackTrace();
