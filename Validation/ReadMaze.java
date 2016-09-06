@@ -72,6 +72,42 @@ public class ReadMaze {
 	}  
 	
 	
+	public void readValidMaze () throws IOException
+	{
+		
+		Scanner scanner = null;
+		String text = null;
+		boolean foundS = false;
+		boolean foundD = false; 
+		int inValidmaze = 0;
+		
+		try {
+			File fl = new File(this.fileName);
+			scanner = new Scanner(fl);
+			text = scanner.useDelimiter("\\A").next();
+			
+		} finally {
+			if (scanner != null) {
+				scanner.close();				
+			}
+		}
+		
+		String[] parts = text.split("\\r\\n", -1);
+		
+		int lineSize = -1;
+		for (int i = 0, len = parts.length - 1; i < len; i++) {
+			
+			if (i == 0) {
+				lineSize = parts[i].length();
+				break;
+			}
+		}
+		
+		System.out.println("columns"+ lineSize);
+		System.out.println("rows"+(parts.length - 1));
+		
+	}
+	
 	
 	
 	public void mazeRead (boolean includeDigits) throws IllegalArgumentException, IOException
@@ -80,6 +116,7 @@ public class ReadMaze {
 		String text = null;
 		boolean foundS = false;
 		boolean foundD = false; 
+		int inValidmaze = 0;
 		
 		try {
 			File fl = new File(this.fileName);
@@ -95,24 +132,29 @@ public class ReadMaze {
 		
 		String linePattern = includeDigits ? "[#.DS0-9]+" : "[#.DS]+"; 
 		
-		String[] parts = text.split("\\n", -1);
+		//String[] parts = text.split("\\r\\n", -1);
+		String[] parts = text.split("\\r\\n", -1);
 		
 		if (!parts[parts.length - 1].isEmpty()) {
-			throw new IllegalArgumentException("File should end with a LF character.");
+			//throw new IllegalArgumentException("File should end with a LF character.");
+			inValidmaze =1;
 		}
 		
 		int lineSize = -1;
 		for (int i = 0, len = parts.length - 1; i < len; i++) {
 			if (parts[i].isEmpty()) {
-				throw new IllegalArgumentException("Line can not be empty.");
+				//throw new IllegalArgumentException("Line can not be empty.");
+				inValidmaze =1;
 			}
 			if (!parts[i].matches(linePattern)) {
-				throw new IllegalArgumentException("Invalid line: " + parts[i]);
+				//throw new IllegalArgumentException("Invalid line: " + parts[i]);
+				inValidmaze =1;
 			}
 			
 			if( foundS == true && parts[i].indexOf('S') >= 0)
 			{
-				throw new IllegalArgumentException("Multiple start points found");
+				//throw new IllegalArgumentException("Multiple start points found");
+				inValidmaze =1;
 			}
 				
 			if(foundS == false && parts[i].indexOf('S') >= 0 )
@@ -120,7 +162,8 @@ public class ReadMaze {
 			
 			if( foundD == true && parts[i].indexOf('D') >= 0)
 			{
-				throw new IllegalArgumentException("Multiple end points found");
+				//throw new IllegalArgumentException("Multiple end points found");
+				inValidmaze =1;
 			}
 			
 			if( foundD == false && parts[i].indexOf('D') >= 0)
@@ -130,10 +173,21 @@ public class ReadMaze {
 				lineSize = parts[i].length();
 			} else {
 				if (parts[i].length() != lineSize) {
-					throw new IllegalArgumentException("Invalid line size.");
+					//throw new IllegalArgumentException("Invalid line size.");
+					inValidmaze =1;
 				}
 			}
 		}
+		
+		if( inValidmaze ==1 || foundS == false || foundD == false)
+			System.out.println("NO");
+		else
+		{
+			System.out.println("YES");
+			System.out.println("columns"+ lineSize);
+			System.out.println("rows"+(parts.length - 1));
+		}
+	
 	}                                             
 	
 	
@@ -268,10 +322,11 @@ public class ReadMaze {
 	}
 
 	public static void main(String args[]) {
-		ReadMaze read = new ReadMaze(args[0]);
+		//ReadMaze read = new ReadMaze(args[0]);
+		ReadMaze read = new ReadMaze("C:\\Users\\rangira\\Downloads\\p538_project1\\testdata\\task1.in.6");
 		try {
 			read.mazeRead(false);
-			printMaze(read.maze());
+			/*printMaze(read.maze());
 			
 			//printing the ascii values of the characters
 			//printMazeAsciiChars(read.maze());
@@ -292,7 +347,7 @@ public class ReadMaze {
 			
 			if(read.getTeleportPoints() != null)
 			System.out.println("teleport points : "	+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
-							.getTeleportPoints()));
+							.getTeleportPoints()));*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
