@@ -109,6 +109,33 @@ public class ReadMaze {
 	}
 	
 	
+	public char[][] readValidMazeArrayList () throws IOException
+	{
+		ArrayList <String> lst = new ArrayList<String>();
+		
+		File fl = new File(this.fileName);
+		BufferedReader br = new BufferedReader(new FileReader(fl));
+		String line;
+		int index = 0;
+		int size;
+		
+		while ((line = br.readLine()) != null) {
+			lst.add(line);
+		}
+		
+		System.out.println("columns"+ lst.get(0).length());
+		System.out.println("rows"+lst.size());
+		
+		char[][] maze = new char [lst.size()][lst.get(0).length()];
+		
+		for(int i=0;i<lst.size();i++)
+			maze[i] = lst.get(i).toCharArray();
+		
+		this.walkMaze_(maze);
+		return maze;
+	}
+	
+	
 	
 	public void mazeRead (boolean includeDigits) throws IllegalArgumentException, IOException
 	{
@@ -133,7 +160,7 @@ public class ReadMaze {
 		String linePattern = includeDigits ? "[#.DS0-9]+" : "[#.DS]+"; 
 		
 		//String[] parts = text.split("\\r\\n", -1);
-		String[] parts = text.split("\\r\\n", -1);
+		String[] parts = text.split("\\n", -1);
 		
 		if (!parts[parts.length - 1].isEmpty()) {
 			//throw new IllegalArgumentException("File should end with a LF character.");
@@ -308,6 +335,28 @@ public class ReadMaze {
 		 * System.out.println("i = "+ i); System.out.println("j = "+ j);
 		 */
 	}
+	
+	
+	void walkMaze_ (char[][] maze) {
+		int i = 0, j = 0;
+		for (i = 0; i < maze.length; i++)
+			for (j = 0; j < maze[i].length; j++) {
+				if (maze[i][j] == 'S')
+					setStart(i, j);
+				if (maze[i][j] == 'D')
+					setEnd(i, j);
+				if (((int) maze[i][j]) >= 48 && ((int) maze[i][j]) <= 57)
+					setTeleportPoints(i, j, maze[i][j]);
+			}
+		this.rows = i;
+		this.cols = j;
+		/*
+		 * System.out.println("i = "+ i); System.out.println("j = "+ j);
+		 */
+	}
+	
+	
+	
 
 	int getRows() {
 		return this.rows;
@@ -323,14 +372,16 @@ public class ReadMaze {
 
 	public static void main(String args[]) {
 		//ReadMaze read = new ReadMaze(args[0]);
-		ReadMaze read = new ReadMaze("C:\\Users\\rangira\\Downloads\\p538_project1\\testdata\\task1.in.6");
+		//ReadMaze read = new ReadMaze("C:\\Users\\rangira\\Downloads\\p538_project1\\testdata\\task1.in.1");
+		ReadMaze read = new ReadMaze("C:\\Users\\rangira\\Downloads\\task1.in.1");
 		try {
 			read.mazeRead(false);
+			printMaze(read.readValidMazeArrayList());
 			/*printMaze(read.maze());
 			
 			//printing the ascii values of the characters
 			//printMazeAsciiChars(read.maze());
-			// read.walkMaze(read.maze());
+			// read.walkMaze(read.maze());*/
 			System.out.println("start point : " + read.getStart().toString());
 			System.out.println("end point : " + read.getEnd().toString());
 			if(read.getTeleportPoints() != null)
@@ -347,7 +398,7 @@ public class ReadMaze {
 			
 			if(read.getTeleportPoints() != null)
 			System.out.println("teleport points : "	+ new PrettyPrintingMap<Integer, LinkedHashSet<Point>>(read
-							.getTeleportPoints()));*/
+							.getTeleportPoints()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
